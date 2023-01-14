@@ -1,0 +1,28 @@
+Install the necesary packages. jsonwebtoken, bcryptjs
+Create the middleware folder
+Create user migrations and models
+Create an auth route and service file
+add the register and login endpoints
+  Algorithm for register
+    Get the user's register and login user input
+    Verify the input
+    Check if user exist
+    Hash the user's password
+    Add the new user to the DB
+    Create a token and send
+  Algorithm for login
+    Get user's login request body
+    Verify user's input
+    Check if user exist in the DB
+    Compare password
+    Construct a JWT and send
+
+Add the auth middleware to verify token
+  Algorithm
+    Get the token
+    Check if token exist
+    Verify and decode token with TOKEN KEY
+    Set user on req object
+    Else
+    Return 401 invalid token
+    Call next();
