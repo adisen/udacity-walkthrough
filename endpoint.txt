@@ -1,0 +1,18 @@
+Setting up endpoints / Authentication
+
+- Create a route folder to handle routes 
+- Create the services folder to handle respective routes
+- Create the books route file and import into app.js
+
+Route file
+- Import the book model
+- Use in bookService and import into book route
+
+Cors
+- Install the CORS package
+- Enable CORS
+- More on CORS options https://expressjs.com/en/resources/middleware/cors.html
+
+
+Authentication
+- Install the required packages
