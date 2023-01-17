@@ -51,109 +51,132 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 var express_1 = require("express");
-var users_1 = require("../models/users");
 var password_validator_1 = __importDefault(require("password-validator"));
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+var users_1 = require("../models/users");
 var router = (0, express_1.Router)();
 var users = new users_1.Users();
 var validator = new password_validator_1["default"]();
 validator.is().min(8).has().uppercase().has().lowercase().has().digits();
-// Register
-// ROUTE: /users/register
+// Register route
 router.post("/register", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var body, user, hashedPassword, token, error_1;
+    var userData, user, hashedPassword, token, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 4, , 5]);
-                body = req.body;
-                if (!body.firstname || !body.lastname || !body.username || !body.password) {
-                    res.status(400).send("Invalid input");
-                    return [2 /*return*/];
-                }
-                // Check that passwords matches the requirements
-                if (!validator.validate(body.password)) {
-                    res.status(400).send("Please enter a secure password");
-                    return [2 /*return*/];
-                }
-                return [4 /*yield*/, users.getUserByUsername(body.username)];
+                userData = req.body;
+                _a.label = 1;
             case 1:
+                _a.trys.push([1, 5, , 6]);
+                // Check that input is not empty
+                if (!userData.firstname ||
+                    !userData.lastname ||
+                    !userData.password ||
+                    !userData.username) {
+                    res.status(400).json({
+                        message: "Invalid input data"
+                    });
+                    return [2 /*return*/];
+                }
+                // Validate your password
+                if (!validator.validate(userData.password)) {
+                    res.status(400).json({
+                        message: "Please type in a password with an uppercase, lowercase and a digist and must be of length greater than 8"
+                    });
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, users.getUserByUsername(userData.username)];
+            case 2:
                 user = _a.sent();
                 if (user) {
-                    res.status(400).send("Username already taken");
+                    res.status(400).json({
+                        message: "Username already taken, try another username"
+                    });
                     return [2 /*return*/];
                 }
-                return [4 /*yield*/, bcryptjs_1["default"].hash(body.password, Number(process.env.SALT))];
-            case 2:
+                return [4 /*yield*/, bcryptjs_1["default"].hash(userData.password, Number(process.env.SALT))];
+            case 3:
                 hashedPassword = _a.sent();
                 return [4 /*yield*/, users.createUser({
-                        firstname: body.firstname,
-                        lastname: body.lastname,
-                        username: body.username,
+                        firstname: userData.firstname,
+                        lastname: userData.lastname,
+                        username: userData.username,
                         password: hashedPassword
                     })];
-            case 3:
-                //   Add the new user to the DB
-                user = _a.sent();
-                token = jsonwebtoken_1["default"].sign({
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    id: user.id,
-                    username: user.username
-                }, String(process.env.JWT_SECRET));
-                res.send(token);
-                return [2 /*return*/];
             case 4:
-                error_1 = _a.sent();
-                console.log(error_1);
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
-        }
-    });
-}); });
-// Login
-router.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var body, user, compare, token, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 3, , 4]);
-                body = req.body;
-                if (!body.username || !body.password) {
-                    res.status(400).send("Invalid input");
-                    return [2 /*return*/];
-                }
-                return [4 /*yield*/, users.getUserByUsername(body.username)];
-            case 1:
+                // Add the new user to our DB
                 user = _a.sent();
-                if (!user) {
-                    res.status(400).send("Invalid login details");
-                    return [2 /*return*/];
-                }
-                return [4 /*yield*/, bcryptjs_1["default"].compare(body.password, user.password)];
-            case 2:
-                compare = _a.sent();
-                if (!compare) {
-                    res.status(400).send("Invalid login details");
-                    return [2 /*return*/];
-                }
                 token = jsonwebtoken_1["default"].sign({
                     firstname: user.firstname,
                     lastname: user.lastname,
-                    id: user.id,
-                    username: user.username
+                    username: user.username,
+                    id: user.id
                 }, String(process.env.JWT_SECRET));
                 res.json({
                     token: token,
                     user: __assign({}, user)
                 });
-                return [2 /*return*/];
+                return [3 /*break*/, 6];
+            case 5:
+                error_1 = _a.sent();
+                console.log(error_1);
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
+        }
+    });
+}); });
+// Login route
+router.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userData, user, match, token, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                userData = req.body;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                // Check that input is not empty
+                if (!userData.password || !userData.username) {
+                    res.status(400).json({
+                        message: "Please enter your username and password"
+                    });
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, users.getUserByUsername(userData.username)];
+            case 2:
+                user = _a.sent();
+                if (!user) {
+                    res.status(400).json({
+                        message: "Your username or password is incorrect"
+                    });
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, bcryptjs_1["default"].compare(userData.password, user.password)];
             case 3:
+                match = _a.sent();
+                if (!match) {
+                    res.status(400).json({
+                        message: "Your username or password is incorrect"
+                    });
+                    return [2 /*return*/];
+                }
+                token = jsonwebtoken_1["default"].sign({
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    username: user.username,
+                    id: user.id
+                }, String(process.env.JWT_SECRET));
+                res.json({
+                    token: token,
+                    user: __assign(__assign({}, user), { password: "_" })
+                });
+                return [3 /*break*/, 5];
+            case 4:
                 error_2 = _a.sent();
                 console.log(error_2);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); });

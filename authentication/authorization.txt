@@ -4,7 +4,7 @@ Create user migrations and models
 Create an auth route and service file
 add the register and login endpoints
   Algorithm for register
-    Get the user's register and login user input
+    Get the user's register user input
     Verify the input
     Check if user exist
     Hash the user's password

@@ -40,11 +40,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 exports.__esModule = true;
 exports.Users = void 0;
+// @ts-ignore
 var database_1 = __importDefault(require("../database"));
 var Users = /** @class */ (function () {
     function Users() {
     }
-    // Get Users
+    // Get all users
     Users.prototype.getUsers = function () {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, error_1;
@@ -63,13 +64,13 @@ var Users = /** @class */ (function () {
                         return [2 /*return*/, result.rows];
                     case 3:
                         error_1 = _a.sent();
-                        throw new Error("Error when fetching fetch users ".concat(error_1));
+                        throw new Error("Cannot get users ".concat(error_1));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    // Get User
+    // Get single user by id
     Users.prototype.getUser = function (id) {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, error_2;
@@ -80,20 +81,21 @@ var Users = /** @class */ (function () {
                         return [4 /*yield*/, database_1["default"].connect()];
                     case 1:
                         conn = _a.sent();
-                        sql = "SELECT * FROM users WHERE id=".concat(id);
-                        return [4 /*yield*/, conn.query(sql)];
+                        sql = "SELECT * FROM users WHERE id=($1)";
+                        return [4 /*yield*/, conn.query(sql, [id])];
                     case 2:
                         result = _a.sent();
                         conn.release();
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         error_2 = _a.sent();
-                        throw new Error("Error when fetching fetch users ".concat(error_2));
+                        throw new Error("Cannot get user by id ".concat(error_2));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
+    // Get single user by username
     Users.prototype.getUserByUsername = function (username) {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, error_3;
@@ -112,34 +114,37 @@ var Users = /** @class */ (function () {
                         return [2 /*return*/, result.rows[0]];
                     case 3:
                         error_3 = _a.sent();
-                        throw new Error("Error when fetching fetch users ".concat(error_3));
+                        throw new Error("Cannot get user by username ".concat(error_3));
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
-    // Create User
+    // Create user
+    // Get single user by username
     Users.prototype.createUser = function (user) {
         return __awaiter(this, void 0, void 0, function () {
             var conn, sql, result, error_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _a.trys.push([0, 4, , 5]);
                         return [4 /*yield*/, database_1["default"].connect()];
                     case 1:
                         conn = _a.sent();
-                        console.log(user.password);
-                        sql = "INSERT INTO users (firstname, lastname, username, password) VALUES('".concat(user.firstname, "', '").concat(user.lastname, "', '").concat(user.username, "', '").concat(user.password, "')");
+                        sql = "INSERT INTO users(firstname, lastname, username, password) VALUES('".concat(user.firstname, "', '").concat(user.lastname, "', '").concat(user.username, "', '").concat(user.password, "')");
                         return [4 /*yield*/, conn.query(sql)];
                     case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.getUserByUsername(user.username)];
+                    case 3:
                         result = _a.sent();
                         conn.release();
-                        return [2 /*return*/, result.rows[0]];
-                    case 3:
+                        return [2 /*return*/, result];
+                    case 4:
                         error_4 = _a.sent();
-                        throw new Error("Error when creating users ".concat(error_4));
-                    case 4: return [2 /*return*/];
+                        throw new Error("Cannot get user by username ".concat(error_4));
+                    case 5: return [2 /*return*/];
                 }
             });
         });
